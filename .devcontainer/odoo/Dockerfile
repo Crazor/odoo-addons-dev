@@ -12,22 +12,10 @@ RUN if ! cat /etc/group | grep -e "^pip-global:" > /dev/null 2>&1; then groupadd
     && chown :pip-global ${PIP_TARGET} \
     && ( [ ! -f "/etc/profile.d/00-restore-env.sh" ] || sed -i -e "s/export PATH=/export PATH=\/usr\/local\/pip-global:/" /etc/profile.d/00-restore-env.sh )
 
-# [Option] Install Node.js
-# ARG INSTALL_NODE="true"
-# ARG NODE_VERSION="lts/*"
-# RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install ${NODE_VERSION} 2>&1"; fi
-
 # [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
 # COPY requirements.txt /tmp/pip-tmp/
 # RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
 #    && rm -rf /tmp/pip-tmp
-
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
-
-# [Optional] Uncomment this line to install global node packages.
-# RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
 
 # Create directories and set permissions
 RUN mkdir /etc/odoo /opt/odoo /opt/odoo/scripts \
@@ -37,16 +25,14 @@ WORKDIR /opt/odoo
 
 # Install Odoo
 USER vscode
-ARG ODOO_VERSION="master"
-RUN git clone --branch=${ODOO_VERSION} --depth=1 https://github.com/odoo/odoo.git odoo
+RUN git clone --branch=15.0 --depth=1 https://github.com/odoo/odoo.git odoo
 USER root
 
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
 # https://github.com/odoo/docker/blob/master/14.0/Dockerfile
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -y --no-install-recommends \
-        build-essential fonts-noto-cjk libldap2-dev libsasl2-dev \
-        postgresql-client \
+        build-essential fonts-noto-cjk libldap2-dev libsasl2-dev postgresql-client \
         python3-dev python3-lxml python3-num2words python3-pdfminer python3-phonenumbers python3-pip \
         python3-pyldap python3-qrcode python3-renderpm python3-setuptools python3-slugify \
         python3-vobject python3-watchdog python3-xlrd python3-xlwt
@@ -67,17 +53,12 @@ RUN curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releas
     && apt-get install -y --no-install-recommends ./wkhtmltox.deb \
     && rm -rf /var/lib/apt/lists/* wkhtmltox.deb
 
-# Right-to-left interface support
-# See also: https://www.odoo.com/documentation/master/administration/install/install.html#dependencies
-ARG SUPPORT_RTLCSS="true"
-RUN if [ "${SUPPORT_RTLCSS}" = "true" ]; then su vscode -c "umask 0002 && . /usr/local/share/nvm/nvm.sh && nvm install lts/* && npm install -g rtlcss 2>&1"; fi
-
 # Install pylint odoo plugin https://github.com/OCA/pylint-odoo
 # See also: https://odoo-development.readthedocs.io/en/latest/ide/emacs/pylint.html
-RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade git+https://github.com/oca/pylint-odoo.git
-#RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade --pre pylint-odoo
-COPY odoo/.pylintrc /home/vscode
-RUN chown vscode:vscode /home/vscode/.pylintrc
+# RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade git+https://github.com/oca/pylint-odoo.git
+# #RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade --pre pylint-odoo
+# COPY odoo/.pylintrc /home/vscode
+# RUN chown vscode:vscode /home/vscode/.pylintrc
 
 # Install bobtemplates.odoo.
 # See also: https://github.com/acsone/bobtemplates.odoo
@@ -85,6 +66,7 @@ RUN pip3 --disable-pip-version-check --no-cache-dir install --upgrade bobtemplat
 
 # Define runtime configuration
 COPY odoo/entrypoint.sh /opt/odoo
+RUN chmod +x /opt/odoo/entrypoint.sh
 COPY odoo/scripts/* /opt/odoo/scripts
 COPY odoo/odoo.conf /etc/odoo
 RUN chown vscode:vscode /etc/odoo/odoo.conf
