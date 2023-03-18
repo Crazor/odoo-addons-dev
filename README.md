@@ -19,20 +19,18 @@ Install the following tools.
 ## Using this template
 
 1. Open the repository on github.  
-   https://github.com/jp-rad/odoo-addons-dev
+   https://github.com/Crazor/odoo-addons-dev
 
 1. `Use this template`
    Click `Use this template`.  
-   [Here - https://github.com/jp-rad/odoo-addons-dev/generate](https://github.com/jp-rad/odoo-addons-dev/generate)
+   [Here - https://github.com/Crazor/odoo-addons-dev/generate](https://github.com/Crazor/odoo-addons-dev/generate)
 
 
 ## git clone
 
 1. Open the command prompt and run below commands.
 
-```CommandPrompt.cmd
-mkdir c:\workgit
-cd c:\workgit
+```
 git clone <your GitHub Code URL>
 ```
 
@@ -48,7 +46,7 @@ git clone <your GitHub Code URL>
 ## custom_addons
 
 1. You can develop your own add-ons in "custom_addons" folder, see the Odoo tutorials, etc.  
-https://www.odoo.com/documentation/master/developer/howtos/backend.html
+https://www.odoo.com/documentation/15.0/developer/tutorials/backend.html
 1. To add a new empty module, issue the following command
 ```
 /opt/odoo/odoo/odoo-bin scaffold <module name>
