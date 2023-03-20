@@ -25,7 +25,7 @@ WORKDIR /opt/odoo
 
 # Install Odoo
 USER vscode
-RUN git clone --branch=15.0 --depth=1 https://github.com/odoo/odoo.git odoo
+RUN git clone --branch=${ODOO_VERSION} --depth=1 https://github.com/odoo/odoo.git odoo
 USER root
 
 # Install some deps, lessc and less-plugin-clean-css, and wkhtmltopdf
